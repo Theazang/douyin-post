@@ -1,0 +1,802 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>🐾 猫咪素材排期</title>
+<link rel="manifest" href="data:application/json;base64,eyJuYW1lIjoi5YiG5Lqr55Sf57G7Iiwic2hvcnRfbmFtZSI6IuWbveS4reWbvSIsInN0YXJ0X3VybCI6Ii4iLCJkaXNwbGF5Ijoic3RhbmRhbG9uZSIsImJhY2tncm91bmRfY29sb3IiOiIjZmZmIiwiX2NvbG9yX3NjaGVtZSI6ImxpZ2h0In0=">
+<script src="https://unpkg.com/@supabase/supabase-js@2"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --mint:#94e2d5;
+  --mint-light:#c6f7ef;
+  --coffee:#7c553c;
+  --coffee-light:#b89276;
+  --cream:#fff8ef;
+  --accent-yellow:#f9e0b7;
+  --text-dark:#543827;
+  --line:#d9c3b2;
+  --shadow:0 4px 14px rgba(124,85,60,.14);
+  --radius:18px;
+}
+*{box-sizing:border-box;margin:0;padding:0;font-family:"Noto Sans SC","PingFang SC","Hiragino Sans GB","Yuanti SC","圆体","Microsoft YaHei",system-ui,-apple-system,sans-serif}
+body{
+  background-image:
+    radial-gradient(circle at 12% 18%, rgba(148,226,213,.18), transparent 32%),
+    radial-gradient(circle at 88% 12%, rgba(249,224,183,.18), transparent 30%),
+    radial-gradient(circle at 80% 88%, rgba(184,146,118,.14), transparent 34%),
+    linear-gradient(160deg,rgba(255,248,239,.45) 0%,rgba(255,252,246,.48) 52%,rgba(246,252,250,.45) 100%),
+    url("豆包.png");
+  background-size:cover,cover,cover,cover,contain;
+  background-position:center,center,center,center,bottom right;
+  background-repeat:no-repeat,no-repeat,no-repeat,no-repeat,no-repeat;
+  background-attachment:fixed;
+  color:var(--text-dark);padding:14px;min-height:100vh;
+}
+/* ===== 装饰层：飘浮爪印与小星星，不挡点击 ===== */
+.deco-layer{position:fixed;inset:0;pointer-events:none;z-index:0;overflow:hidden}
+.deco{position:absolute;font-size:16px;opacity:.35;animation:floatUp linear infinite}
+@keyframes floatUp{
+  0%{transform:translateY(10vh) rotate(0deg) scale(.9);opacity:0}
+  12%{opacity:.42}
+  80%{opacity:.28}
+  100%{transform:translateY(-105vh) rotate(28deg) scale(1.05);opacity:0}
+}
+.deco-star{position:absolute;font-size:13px;opacity:.5;animation:twinkle 3.4s ease-in-out infinite}
+@keyframes twinkle{
+  0%,100%{opacity:.18;transform:scale(.82)}
+  50%{opacity:.75;transform:scale(1.15)}
+}
+/* 主内容浮在装饰层上 */
+.tab,.panel{position:relative;z-index:1}
+.tab{display:flex;gap:10px;margin-bottom:14px;flex-wrap:wrap}
+.tab button{
+  padding:10px 18px;border:2px dashed var(--coffee-light);border-radius:999px;background:rgba(255,255,255,.6);color:var(--coffee);
+  font-size:14px;cursor:pointer;box-shadow:var(--shadow);transition:all .18s;
+}
+.tab button.active{background:var(--coffee);color:#fff;border:2px dashed #fff;box-shadow:0 6px 16px rgba(124,85,60,.3)}
+.tab button:hover{transform:translateY(-2px)}
+.panel{display:none}
+.panel.show{display:block}
+.card{
+  background:rgba(255,255,255,.72);border-radius:var(--radius);padding:16px;margin-bottom:12px;
+  box-shadow:var(--shadow);border:2px dashed var(--line);position:relative;overflow:hidden;
+  backdrop-filter:blur(4px);
+}
+.card::before{
+  content:"";position:absolute;top:0;left:0;right:0;height:5px;
+  background:linear-gradient(90deg,var(--mint),var(--accent-yellow),var(--coffee-light));
+}
+/* 卡片顶部流光 */
+.card::after{
+  content:"";position:absolute;top:0;left:-40%;width:40%;height:5px;
+  background:linear-gradient(90deg,transparent,rgba(255,255,255,.95),transparent);
+  animation:shine 6s ease-in-out infinite;
+}
+@keyframes shine{0%{left:-40%}45%{left:100%}100%{left:100%}}
+.card{transition:box-shadow .25s,transform .25s,border-color .25s}
+.card:hover{box-shadow:0 10px 26px rgba(124,85,60,.2);border-color:var(--mint);transform:translateY(-2px)}
+h3{font-size:16px;color:var(--coffee);margin-bottom:6px}
+h3::after{
+  content:"";display:block;width:56px;height:4px;margin-top:5px;border-radius:999px;
+  background:linear-gradient(90deg,var(--mint),var(--coffee-light));
+}
+input,select,textarea{
+  width:100%;padding:11px 13px;border:2px solid var(--line);border-radius:14px;
+  margin:6px 0;font-size:14px;background:rgba(255,255,255,.65);color:var(--text-dark);outline:none;transition:border .15s;
+}
+input:focus,select:focus,textarea:focus{border-color:var(--mint);box-shadow:0 0 0 3px rgba(148,226,213,.28)}
+button{padding:9px 14px;border:none;border-radius:14px;background:var(--coffee);color:#fff;cursor:pointer;transition:all .16s;box-shadow:0 4px 12px rgba(124,85,60,.25);position:relative;overflow:hidden}
+button:hover{transform:translateY(-1px);filter:brightness(1.06);box-shadow:0 7px 18px rgba(124,85,60,.32)}
+button:active{transform:scale(.96)}
+/* 按钮划过光泽 */
+button::after{
+  content:"";position:absolute;top:0;left:-60%;width:45%;height:100%;
+  background:linear-gradient(120deg,transparent,rgba(255,255,255,.55),transparent);
+  transform:skewX(-18deg);transition:left .5s ease;
+}
+button:hover::after{left:120%}
+.del{background:#f0b4a6;box-shadow:0 4px 12px rgba(240,180,166,.3)}
+.edit{background:var(--accent-yellow);color:var(--coffee);box-shadow:0 4px 12px rgba(249,224,183,.35)}
+.topic-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(104px,1fr));gap:8px;margin-top:10px}
+.topic-item{
+  padding:9px 10px;border-radius:16px;border-left:4px solid;font-size:13px;line-height:1.3;
+  cursor:grab;background:rgba(255,255,255,.62);box-shadow:0 3px 10px rgba(0,0,0,.06);transition:transform .15s;
+}
+.topic-item:hover{transform:translateY(-3px) scale(1.02);box-shadow:0 8px 18px rgba(124,85,60,.18)}
+.topic-item .title{font-weight:bold;margin-bottom:5px;word-break:break-word;color:var(--text-dark)}
+.topic-item .cat-tag{display:inline-block;font-size:10px;color:var(--coffee);background:linear-gradient(90deg,var(--accent-yellow),#ffe9c9);border-radius:999px;padding:2px 8px;margin-bottom:5px}
+.topic-actions{display:flex;gap:5px;flex-wrap:wrap}
+.topic-actions button{padding:4px 9px;font-size:11px;border-radius:10px}
+.color-row{display:flex;gap:8px;align-items:center;margin:6px 0}
+#t_color{width:64px;padding:3px}
+.chosen-tags{display:flex;flex-wrap:wrap;gap:6px;margin:6px 0}
+.chosen-tag{display:inline-flex;align-items:center;gap:6px;background:linear-gradient(90deg,var(--mint-light),#fff3e2);color:var(--coffee);padding:5px 11px;border-radius:999px;font-size:13px;border:1.5px solid var(--line)}
+.chosen-tag .x{cursor:pointer;font-weight:bold;padding:0 2px}
+.plan-layout{display:grid;grid-template-columns:270px 1fr;gap:14px;align-items:start}
+.plan-side{min-width:0}
+.plan-side:first-child{position:sticky;top:14px;max-height:calc(100vh - 28px);display:flex;flex-direction:column}
+#topicBox{max-height:none;overflow-y:auto}
+.plan-side h4{margin-bottom:8px;font-size:14px;color:var(--coffee)}
+.filter-bar{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:10px}
+.filter-bar button{padding:6px 12px;font-size:12px;border-radius:999px;background:rgba(255,255,255,.6);color:var(--coffee-light);border:1.5px solid var(--line);box-shadow:0 2px 8px rgba(0,0,0,.06)}
+.filter-bar button.active{background:var(--mint);color:var(--coffee);border-color:var(--mint)}
+.cat-group{margin-bottom:12px}
+.cat-group h5{font-size:13px;color:var(--coffee-light);margin:6px 0 6px;padding-left:2px}
+.cal-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px}
+.cal-header h3{font-size:18px}
+.cal-nav{display:flex;gap:6px}
+.cal-nav button{background:rgba(255,255,255,.6);color:var(--coffee)}
+.cal-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:7px}
+.cal-week{font-size:12px;color:var(--coffee-light);text-align:center;padding:6px 0}
+.cal-cell{background:rgba(255,255,255,.55);border-radius:16px;min-height:98px;padding:7px;border:2px dashed var(--line);box-shadow:0 2px 8px rgba(0,0,0,.04);backdrop-filter:blur(3px);transition:transform .18s,box-shadow .18s,border-color .18s}
+.cal-cell:hover{transform:translateY(-2px);box-shadow:0 8px 20px rgba(124,85,60,.16);border-color:var(--mint)}
+.cal-cell.over{border-color:var(--mint);background:var(--mint-light)}
+.cal-cell.blank{background:transparent;border:none;box-shadow:none;min-height:98px}
+.cal-day{font-size:12px;color:var(--coffee-light);margin-bottom:4px;display:flex;justify-content:space-between;align-items:center}
+.cal-day .views{font-weight:bold;color:var(--coffee)}
+.cal-topic{display:flex;align-items:center;gap:6px;margin:5px 0;padding:6px 9px;border-radius:12px;font-size:13px;line-height:1.3;border-left:4px solid}
+.cal-topic .num{font-weight:bold;color:var(--coffee-light);min-width:16px}
+.cal-topic .tname{flex:1;word-break:break-word}
+.cal-topic .mv{display:flex;flex-direction:column;gap:1px}
+.cal-topic .mv button{padding:0 5px;font-size:11px;line-height:1.2;background:#fff;border:1px solid var(--line);border-radius:7px;cursor:pointer;color:var(--coffee-light)}
+.cal-topic .rm{padding:0 6px;font-size:12px;line-height:1.2;background:#fff;border:1px solid #f0c4bb;border-radius:7px;cursor:pointer;color:#d9705f}
+.table-wrap{overflow-x:auto;background:rgba(255,255,255,.72);border-radius:var(--radius);box-shadow:var(--shadow);border:2px dashed var(--line);backdrop-filter:blur(4px)}
+table{width:100%;border-collapse:collapse;font-size:13px;min-width:560px}
+thead th{background:linear-gradient(90deg,var(--mint-light),#fff3e2);color:var(--coffee);text-align:left;padding:11px 13px;font-weight:600;white-space:nowrap}
+tbody td{padding:11px 13px;border-top:1px solid var(--line);vertical-align:middle}
+tbody tr:hover{background:linear-gradient(90deg,rgba(198,247,239,.55),rgba(255,255,255,.9))}
+td.num,th.num{text-align:right;white-space:nowrap}
+td .ops{display:flex;gap:6px}
+td .ops button{padding:6px 11px;font-size:12px;border-radius:10px}
+.empty{padding:22px;text-align:center;color:var(--coffee-light)}
+.chart-card{margin-top:12px}
+.chart-head{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;margin-bottom:8px}
+.chart-head h3{margin-bottom:0}
+.chart-total{display:flex;gap:14px;font-size:13px;color:var(--coffee)}
+.chart-total b{font-weight:700}
+.chart-total .tv{color:var(--coffee)}
+.chart-total .tn{color:var(--mint);font-weight:700}
+.chart-total .tl{color:#e8743b}
+.chart-total .tf{color:#7c5cbf}
+.month-bar{display:flex;align-items:center;justify-content:space-between;gap:10px;margin:4px 0 10px}
+.month-bar strong{font-size:15px;color:var(--coffee)}
+.month-bar button{background:rgba(255,255,255,.6);color:var(--coffee);border:1.5px solid var(--line);padding:7px 13px;font-size:13px}
+#viewChart{width:100%;overflow-x:auto}
+#viewChart svg{display:block;min-width:520px}
+.chart-axis{stroke:var(--line);stroke-width:1}
+.chart-grid{stroke:var(--line);stroke-width:1;stroke-dasharray:4 4}
+.chart-line{fill:none;stroke:var(--mint);stroke-width:3;stroke-linecap:round;stroke-linejoin:round}
+.chart-line-like{fill:none;stroke:#e8743b;stroke-width:3;stroke-linecap:round;stroke-linejoin:round}
+.chart-line-fans{fill:none;stroke:#7c5cbf;stroke-width:3;stroke-linecap:round;stroke-linejoin:round}
+.chart-area{fill:var(--mint);opacity:.18}
+.chart-dot{fill:var(--mint);stroke:#fff;stroke-width:2}
+.chart-dot-like{fill:#e8743b;stroke:#fff;stroke-width:2}
+.chart-dot-fans{fill:#7c5cbf;stroke:#fff;stroke-width:2}
+.chart-label{font-size:11px;fill:var(--coffee-light)}
+.chart-val{font-size:11px;fill:var(--coffee);font-weight:600;paint-order:stroke;stroke:#fff;stroke-width:3px}
+.chart-val-like{font-size:11px;fill:#e8743b;font-weight:600;paint-order:stroke;stroke:#fff;stroke-width:3px}
+.chart-val-fans{font-size:11px;fill:#7c5cbf;font-weight:600;paint-order:stroke;stroke:#fff;stroke-width:3px}
+.chart-legend{display:flex;gap:14px;font-size:12px;color:var(--coffee);margin:4px 0 8px}
+.chart-legend span{display:inline-flex;align-items:center;gap:5px}
+.chart-legend i{width:10px;height:10px;border-radius:50%;display:inline-block}
+@media (max-width:760px){ .plan-layout{grid-template-columns:1fr} .plan-side:first-child{position:static;max-height:none;display:block} }
+@media (max-width:480px){
+  body{padding:9px}
+  .topic-grid{grid-template-columns:repeat(2,1fr)}
+  .tab button{flex:1}
+  button{width:100%}
+  .topic-actions button,.row-actions button{width:auto}
+  .cal-cell{min-height:72px}
+}
+/* 可爱滚动条 */
+::-webkit-scrollbar{width:10px;height:10px}
+::-webkit-scrollbar-track{background:rgba(255,248,239,.5);border-radius:999px}
+::-webkit-scrollbar-thumb{background:linear-gradient(180deg,var(--mint),var(--coffee-light));border-radius:999px;border:2px solid rgba(255,255,255,.7)}
+::-webkit-scrollbar-thumb:hover{background:var(--coffee-light)}
+::selection{background:var(--mint-light);color:var(--coffee)}
+/* 减少动效偏好时关闭装饰动画 */
+@media (prefers-reduced-motion:reduce){
+  .deco,.deco-star,.card::after{animation:none!important}
+  .card:hover,.cal-cell:hover,.topic-item:hover,button:hover{transform:none}
+}
+@media (max-width:480px){ .deco{font-size:13px} }
+</style>
+</head>
+<body>
+<div class="deco-layer" id="decoLayer" aria-hidden="true"></div>
+<div class="tab">
+  <button class="active" data-tab="post">🐱 作品台账</button>
+  <button data-tab="topic">📦 选题排期</button>
+</div>
+
+<div id="post" class="panel show">
+  <div class="card">
+    <h3 id="postFormTitle">☕ 新增抖音作品</h3>
+    <input type="date" id="p_date">
+    <input type="text" id="p_title" placeholder="标题/简述">
+    <select id="p_cateSelect">
+      <option value="">— 添加选题（可多选）—</option>
+    </select>
+    <div class="chosen-tags" id="p_chosenTags"></div>
+    <input type="number" id="p_view" placeholder="播放量">
+    <input type="number" id="p_like" placeholder="点赞">
+    <input type="number" id="p_fans" placeholder="涨粉数量">
+    <textarea id="p_remark" placeholder="备注（转粉、总结）"></textarea>
+    <button onclick="savePost()" id="postSubmitBtn">保存记录 🌿</button>
+    <button class="edit" id="postCancelBtn" style="display:none" onclick="cancelPostEdit()">取消编辑</button>
+  </div>
+  <div class="month-bar">
+    <button onclick="shiftPostMonth(-1)">‹ 上月</button>
+    <strong id="postMonthLabel"></strong>
+    <button onclick="shiftPostMonth(1)">下月 ›</button>
+  </div>
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr>
+          <th>日期</th><th>选题</th><th class="num">播放</th><th class="num">点赞</th><th class="num">涨粉</th><th>备注</th><th>操作</th>
+        </tr>
+      </thead>
+      <tbody id="postList"></tbody>
+    </table>
+  </div>
+  <div class="card chart-card">
+    <div class="chart-head">
+      <h3>📈 播放量 / 点赞趋势（本月）</h3>
+      <div class="chart-total" id="monthTotal"></div>
+    </div>
+    <div id="viewChart"></div>
+  </div>
+</div>
+
+<div id="topic" class="panel">
+  <div class="card">
+    <h3 id="topicFormTitle">🐾 新增选题</h3>
+    <textarea id="t_content" placeholder="拍摄想法，例如：喂猫粮"></textarea>
+    <select id="t_category">
+      <option value="">— 选择大分类（可选）—</option>
+      <option>喂食</option>
+      <option>保养</option>
+      <option>清洁</option>
+      <option>新品</option>
+      <option>手工改造</option>
+      <option>测评</option>
+      <option>置换/商单合作</option>
+    </select>
+    <div class="color-row">
+      <label>选题颜色：</label>
+      <input type="color" id="t_color" value="#4ade80">
+    </div>
+    <button onclick="saveTopic()" id="topicSubmitBtn">添加选题 🌿</button>
+    <button class="edit" id="topicCancelBtn" style="display:none" onclick="cancelEdit()">取消编辑</button>
+  </div>
+
+  <div class="plan-layout">
+    <div class="plan-side">
+      <h4>📦 选题池（拖到右侧日期规划）</h4>
+      <div class="filter-bar" id="filterBar"></div>
+      <div id="topicBox"></div>
+    </div>
+    <div class="plan-side">
+      <div class="cal-header">
+        <h3 id="calTitle"></h3>
+        <div class="cal-nav">
+          <button onclick="changeMonth(-1)">‹ 上月</button>
+          <button onclick="changeMonth(1)">下月 ›</button>
+        </div>
+      </div>
+      <div class="cal-grid" id="calGrid"></div>
+    </div>
+  </div>
+</div>
+
+<script>
+const SUPABASE_URL = "https://hkawmfwxwdihfyzmoqji.supabase.co";
+const SUPABASE_ANON_KEY = "sb_publishable_GCsNmBvhGjp4ZvTq3ZVuSQ_55gCRkDW";
+
+const CATEGORIES = ["喂食","保养","清洁","新品","手工改造","测评","置换/商单合作"];
+
+if(!supabase){ alert("❌ Supabase JS库加载失败，建议打开无痕模式"); }
+const { createClient } = supabase;
+const sb = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+let editingId = null;
+let postEditingId = null;
+let chosenCates = [];
+let calYear, calMonth;
+let topicColorMap = {};
+let topicNameMap = {};
+let allTopics = [];
+let activeFilter = "全部";
+let postYear, postMonth;
+
+function normalizeName(s){
+  return (s||"").replace(/[\u{1F000}-\u{1FAFF}\u{2600}-\u{27BF}\u{2190}-\u{21FF}\u{2B00}-\u{2BFF}\uFE0F]/gu,"").replace(/\s/g,"")
+}
+function matchTopic(name){
+  if(topicColorMap[name]) return {color:topicColorMap[name], display:name}
+  const key=normalizeName(name)
+  if(topicNameMap[key]){
+    const disp=topicNameMap[key]
+    return {color:topicColorMap[disp], display:disp}
+  }
+  return {color:"#3b82f6", display:name}
+}
+function formatViews(n){
+  n=+n||0
+  if(n>=10000){
+    const w=n/10000
+    return (Number.isInteger(w)?w:w.toFixed(1))+"w"
+  }
+  return String(n)
+}
+
+document.querySelectorAll('.tab button').forEach(btn=>{
+  btn.onclick=()=>{
+    document.querySelectorAll('.tab button').forEach(b=>b.classList.remove('active'))
+    btn.classList.add('active')
+    document.querySelectorAll('.panel').forEach(p=>p.classList.remove('show'))
+    document.getElementById(btn.dataset.tab).classList.add('show')
+    if(btn.dataset.tab==='topic'){ loadTopics(); renderCalendar() }
+  }
+})
+
+// ===== 台账 =====
+function renderChosenTags(){
+  const wrap=document.getElementById('p_chosenTags'); wrap.innerHTML=""
+  chosenCates.forEach((c,i)=>{
+    const tag=document.createElement('span'); tag.className="chosen-tag"
+    tag.innerHTML=`${c} <span class="x" data-i="${i}">×</span>`
+    tag.querySelector('.x').onclick=()=>{ chosenCates.splice(i,1); renderChosenTags() }
+    wrap.appendChild(tag)
+  })
+}
+function addCate(content){
+  if(content && !chosenCates.includes(content)){ chosenCates.push(content); renderChosenTags() }
+}
+async function savePost(){
+  const payload={
+    publish_date:document.getElementById('p_date').value,
+    title:document.getElementById('p_title').value,
+    category:chosenCates.join('，'),
+    view_count:+document.getElementById('p_view').value||0,
+    like_count:+document.getElementById('p_like').value||0,
+    follower_count:+document.getElementById('p_fans').value||0,
+    remark:document.getElementById('p_remark').value
+  }
+  try{
+    if(postEditingId===null){
+      const {error}=await sb.from('douyin_posts').insert([payload])
+      if(error) throw error
+      alert("✅ 保存成功啦～")
+    }else{
+      const {error}=await sb.from('douyin_posts').update(payload).eq('id',postEditingId)
+      if(error) throw error
+      alert("✅ 修改成功啦～")
+      cancelPostEdit()
+    }
+    chosenCates=[]; renderChosenTags(); loadPosts()
+  }catch(e){ alert("❌ 保存报错："+e.message) }
+}
+function startPostEdit(r){
+  postEditingId=r.id
+  document.getElementById('p_date').value=r.publish_date||""
+  document.getElementById('p_title').value=r.title||""
+  document.getElementById('p_view').value=r.view_count||0
+  document.getElementById('p_like').value=r.like_count||0
+  document.getElementById('p_fans').value=r.follower_count||0
+  document.getElementById('p_remark').value=r.remark||""
+  chosenCates=(r.category||"").split('，').filter(Boolean)
+  renderChosenTags()
+  document.getElementById('postFormTitle').innerText="☕ 编辑作品记录"
+  document.getElementById('postSubmitBtn').innerText="保存修改 🌿"
+  document.getElementById('postCancelBtn').style.display="inline-block"
+  window.scrollTo({top:0,behavior:'smooth'})
+}
+function cancelPostEdit(){
+  postEditingId=null
+  document.getElementById('p_date').value=""
+  document.getElementById('p_title').value=""
+  document.getElementById('p_view').value=""
+  document.getElementById('p_like').value=""
+  document.getElementById('p_fans').value=""
+  document.getElementById('p_remark').value=""
+  chosenCates=[]; renderChosenTags()
+  document.getElementById('postFormTitle').innerText="☕ 新增抖音作品"
+  document.getElementById('postSubmitBtn').innerText="保存记录 🌿"
+  document.getElementById('postCancelBtn').style.display="none"
+}
+async function loadPosts(){
+  try{
+    const now=new Date()
+    if(postYear===undefined){ postYear=now.getFullYear(); postMonth=now.getMonth() }
+    document.getElementById('postMonthLabel').innerText=`${postYear}年 ${postMonth+1}月`
+
+    const {data}=await sb.from('douyin_posts').select('*').order('publish_date',{asc:false})
+    const tbody=document.getElementById('postList')
+    const monthPrefix=`${postYear}-${String(postMonth+1).padStart(2,'0')}`
+    const monthRows=(data||[]).filter(d=>String(d.publish_date||"").startsWith(monthPrefix))
+
+    if(!monthRows.length){
+      tbody.innerHTML='<tr><td colspan="7" class="empty">🐰 这个月还没有记录哦</td></tr>'
+      document.getElementById('monthTotal').innerHTML='<span class="tn">作品 <b>0</b> 条</span><span class="tv">总播放 <b>0</b></span><span class="tl">总点赞 <b>0</b></span><span class="tf">总涨粉 <b>0</b></span>'
+      renderChart([])
+      return
+    }
+    let html=''
+    monthRows.forEach(d=>{
+      const cates=(d.category||"").split('，').filter(Boolean)
+      const cateHtml=cates.map(c=>{
+        const m=matchTopic(c)
+        return `<span style="color:${m.color}">${m.display}</span>`
+      }).join('、')
+      html+=`<tr>
+        <td>${d.publish_date||''}</td>
+        <td>${cateHtml||'—'}</td>
+        <td class="num">${formatViews(d.view_count)}</td>
+        <td class="num">${d.like_count||0}</td>
+        <td class="num">${d.follower_count||0}</td>
+        <td>${d.remark||''}</td>
+        <td><div class="ops">
+          <button class="edit" onclick='startPostEdit(${JSON.stringify(d)})'>编辑</button>
+          <button class="del" onclick="delPost('${d.id}')">删除</button>
+        </div></td>
+      </tr>`
+    })
+    tbody.innerHTML=html
+    // 当月合计
+    const totalV=monthRows.reduce((s,d)=>s+(+d.view_count||0),0)
+    const totalL=monthRows.reduce((s,d)=>s+(+d.like_count||0),0)
+    const totalF=monthRows.reduce((s,d)=>s+(+d.follower_count||0),0)
+    document.getElementById('monthTotal').innerHTML=
+      `<span class="tn">作品 <b>${monthRows.length}</b> 条</span><span class="tv">总播放 <b>${formatViews(totalV)}</b></span><span class="tl">总点赞 <b>${totalL}</b></span><span class="tf">总涨粉 <b>${totalF}</b></span>`
+    // 趋势图按日期从早到晚
+    const chartData=monthRows.slice().sort((a,b)=>String(a.publish_date).localeCompare(String(b.publish_date)))
+    renderChart(chartData)
+  }catch(e){ alert("加载台账失败："+e.message) }
+}
+function shiftPostMonth(delta){
+  postMonth+=delta
+  if(postMonth<0){postMonth=11;postYear--}
+  if(postMonth>11){postMonth=0;postYear++}
+  loadPosts()
+}
+function renderChart(rows){
+  const box=document.getElementById('viewChart')
+  if(!box) return
+  const pts=rows.filter(r=>r.publish_date)
+  if(pts.length===0){ box.innerHTML='<div class="empty">暂无数据可展示趋势</div>'; return }
+
+  const W=660,H=250,PL=46,PR=46,PT=20,PB=34
+  const innerW=W-PL-PR, innerH=H-PT-PB
+  const maxV=Math.max(...pts.map(r=>+r.view_count||0),1)
+  const niceMax=maxV<=1?1:Math.ceil(maxV/10000)*10000
+  const maxSide=Math.max(...pts.map(r=>Math.max(+r.like_count||0,+r.follower_count||0)),1)
+  const niceSide=maxSide<=1?1:Math.ceil(maxSide/100)*100
+  const x=i=>PL+(pts.length===1?innerW/2:innerW*i/(pts.length-1))
+  const yV=v=>PT+innerH-(innerH*(v/niceMax))
+  const yS=v=>PT+innerH-(innerH*(v/niceSide))
+
+  let gridLines='',yLabels='',rLabels=''
+  const ticks=4
+  for(let t=0;t<=ticks;t++){
+    const val=niceMax*t/ticks
+    const gy=yV(val)
+    gridLines+=`<line class="chart-grid" x1="${PL}" y1="${gy}" x2="${W-PR}" y2="${gy}"/>`
+    yLabels+=`<text class="chart-label" x="${PL-6}" y="${gy+4}" text-anchor="end">${formatViews(val)}</text>`
+    const sv=niceSide*t/ticks
+    rLabels+=`<text class="chart-label" x="${W-PR+6}" y="${yS(sv)+4}" text-anchor="start">${sv}</text>`
+  }
+
+  const vLine=pts.map((r,i)=>`${x(i)},${yV(+r.view_count||0)}`).join(' ')
+  const areaPath=`M${PL},${PT+innerH} L${vLine.replace(/ /g,' L')} L${x(pts.length-1)},${PT+innerH} Z`
+  const lLine=pts.map((r,i)=>`${x(i)},${yS(+r.like_count||0)}`).join(' ')
+  const fLine=pts.map((r,i)=>`${x(i)},${yS(+r.follower_count||0)}`).join(' ')
+
+  let vDots='',lDots='',fDots='',vLabels='',lLabels='',fLabels='',xlabels=''
+  pts.forEach((r,i)=>{
+    const v=+r.view_count||0, l=+r.like_count||0, f=+r.follower_count||0
+    vDots+=`<circle class="chart-dot" cx="${x(i)}" cy="${yV(v)}" r="4.5"/>`
+    lDots+=`<circle class="chart-dot-like" cx="${x(i)}" cy="${yS(l)}" r="4"/>`
+    fDots+=`<circle class="chart-dot-fans" cx="${x(i)}" cy="${yS(f)}" r="4"/>`
+    vLabels+=`<text class="chart-val" x="${x(i)-6}" y="${yV(v)-9}" text-anchor="end">${formatViews(v)}</text>`
+    lLabels+=`<text class="chart-val-like" x="${x(i)+6}" y="${yS(l)+16}" text-anchor="start">${l}</text>`
+    fLabels+=`<text class="chart-val-fans" x="${x(i)-6}" y="${yS(f)-9}" text-anchor="end">${f}</text>`
+    const md=String(r.publish_date).slice(5)
+    xlabels+=`<text class="chart-label" x="${x(i)}" y="${H-12}" text-anchor="middle">${md}</text>`
+  })
+
+  box.innerHTML=`
+    <div class="chart-legend">
+      <span><i style="background:var(--mint)"></i>播放量（左轴）</span>
+      <span><i style="background:#e8743b"></i>点赞量（右轴）</span>
+      <span><i style="background:#7c5cbf"></i>涨粉量（右轴）</span>
+    </div>
+    <svg viewBox="0 0 ${W} ${H}" width="100%" height="${H}">
+      ${gridLines}${yLabels}${rLabels}
+      <path class="chart-area" d="${areaPath}"/>
+      <polyline class="chart-line" points="${vLine}"/>
+      <polyline class="chart-line-like" points="${lLine}"/>
+      <polyline class="chart-line-fans" points="${fLine}"/>
+      ${vDots}${lDots}${fDots}${vLabels}${lLabels}${fLabels}${xlabels}
+    </svg>`
+}
+async function delPost(id){
+  if(!confirm("确定删除这条作品记录？")) return
+  await sb.from('douyin_posts').delete().eq('id',id); loadPosts()
+}
+
+// ===== 选题 =====
+async function saveTopic(){
+  const content=document.getElementById('t_content').value.trim();
+  const tagColor=document.getElementById('t_color').value;
+  const category=document.getElementById('t_category').value;
+  if(!content){alert("选题内容不能为空");return}
+  if(editingId===null){
+    const {error}=await sb.from('topics').insert([{content,tag_name:content,tag_color:tagColor,category:category||null,plan_date:null,status:null}])
+    if(error){ alert("❌ 添加失败："+error.message); return }
+    alert("✅ 添加成功啦～")
+  }else{
+    const {error}=await sb.from('topics').update({content,tag_name:content,tag_color:tagColor,category:category||null}).eq('id',editingId)
+    if(error){ alert("❌ 保存失败："+error.message); return }
+    alert("✅ 修改成功啦～"); cancelEdit()
+  }
+  document.getElementById('t_content').value=""; loadTopics()
+}
+function startEdit(t){
+  editingId=t.id
+  document.getElementById('t_content').value=t.content
+  document.getElementById('t_category').value=t.category||""
+  document.getElementById('t_color').value=t.tag_color
+  document.getElementById('topicFormTitle').innerText="🐾 编辑选题"
+  document.getElementById('topicSubmitBtn').innerText="保存修改 🌿"
+  document.getElementById('topicCancelBtn').style.display="inline-block"
+  window.scrollTo({top:0,behavior:'smooth'})
+}
+function cancelEdit(){
+  editingId=null
+  document.getElementById('t_content').value=""
+  document.getElementById('t_category').value=""
+  document.getElementById('t_color').value="#4ade80"
+  document.getElementById('topicFormTitle').innerText="🐾 新增选题"
+  document.getElementById('topicSubmitBtn').innerText="添加选题 🌿"
+  document.getElementById('topicCancelBtn').style.display="none"
+}
+function renderFilterBar(){
+  const bar=document.getElementById('filterBar')
+  const opts=["全部",...CATEGORIES]
+  bar.innerHTML=""
+  opts.forEach(o=>{
+    const b=document.createElement('button')
+    b.innerText=o
+    if(o===activeFilter) b.classList.add('active')
+    b.onclick=()=>{ activeFilter=o; renderFilterBar(); renderTopicPool() }
+    bar.appendChild(b)
+  })
+}
+function renderTopicPool(){
+  const box=document.getElementById('topicBox'); box.innerHTML=""
+  let list=allTopics.slice()
+  if(activeFilter!=="全部") list=list.filter(t=>(t.category||"")===activeFilter)
+
+  const groups={}
+  list.forEach(t=>{
+    const key=t.category||"未分类"
+    ;(groups[key]=groups[key]||[]).push(t)
+  })
+  const order=[...CATEGORIES,"未分类"]
+  const keys=Object.keys(groups).sort((a,b)=>{
+    const ia=order.indexOf(a), ib=order.indexOf(b)
+    return (ia<0?99:ia)-(ib<0?99:ib)
+  })
+
+  keys.forEach(key=>{
+    const g=document.createElement('div'); g.className="cat-group"
+    const h=document.createElement('h5'); h.innerText=key; g.appendChild(h)
+    const grid=document.createElement('div'); grid.className="topic-grid"
+    groups[key].forEach(t=>{
+      const div=document.createElement('div')
+      div.className="topic-item"; div.draggable=true
+      div.style.backgroundColor=(t.tag_color||"#eeeeee")+"26"
+      div.style.borderLeftColor=t.tag_color||"#999"
+      div.innerHTML=`
+        <div class="cat-tag">${t.category||"未分类"}</div>
+        <div class="title">${t.content}</div>
+        <div class="topic-actions">
+          <button class="edit" onclick='startEdit(${JSON.stringify(t)})'>编辑</button>
+          <button class="del" onclick="delTopic('${t.id}')">删除</button>
+        </div>`
+      div.addEventListener('dragstart',(e)=>{ e.dataTransfer.setData('text/plain',t.content) })
+      grid.appendChild(div)
+    })
+    g.appendChild(grid); box.appendChild(g)
+  })
+  if(!list.length) box.innerHTML='<div class="empty">🐰 这个分类下还没有选题哦</div>'
+}
+async function loadTopics(){
+  const {data,error}=await sb.from('topics').select('*').order('id',{asc:false})
+  if(error){alert("加载选题失败："+error.message);return}
+  allTopics=data||[]
+  topicColorMap={}; topicNameMap={}
+  const cateSelect=document.getElementById('p_cateSelect')
+  cateSelect.innerHTML='<option value="">— 添加选题（可多选）—</option>'
+  allTopics.forEach(t=>{
+    topicColorMap[t.content]=t.tag_color
+    topicNameMap[normalizeName(t.content)]=t.content
+    const opt=document.createElement('option'); opt.value=t.content; opt.innerText=t.content
+    cateSelect.appendChild(opt)
+  })
+  renderFilterBar()
+  renderTopicPool()
+}
+async function delTopic(id){
+  if(!confirm("确定删除这条选题？")) return
+  const {error}=await sb.from('topics').delete().eq('id',id)
+  if(error){ alert("删除失败："+error.message); return }
+  loadTopics()
+}
+document.getElementById('p_cateSelect').onchange=function(){
+  if(this.value){ addCate(this.value) }
+  this.value=""
+}
+
+// ===== 日历 =====
+function changeMonth(delta){
+  calMonth+=delta
+  if(calMonth<0){calMonth=11;calYear--}
+  if(calMonth>11){calMonth=0;calYear++}
+  renderCalendar()
+}
+async function appendTopicToDate(dateStr, topic){
+  const {data:exist} = await sb.from('douyin_posts').select('*').eq('publish_date',dateStr)
+  if(exist && exist.length){
+    const rec = exist[0]
+    const cates=(rec.category||"").split('，').filter(Boolean)
+    if(!cates.includes(topic)) cates.push(topic)
+    await sb.from('douyin_posts').update({category:cates.join('，'),title:cates.join('，')}).eq('id',rec.id)
+  }else{
+    await sb.from('douyin_posts').insert([{
+      publish_date:dateStr, title:topic, category:topic, view_count:0, like_count:0, remark:""
+    }])
+  }
+}
+async function moveTopic(postId, index, dir){
+  const {data:recs} = await sb.from('douyin_posts').select('*').eq('id',postId)
+  if(!recs||!recs.length) return
+  const rec=recs[0]
+  const cates=(rec.category||"").split('，').filter(Boolean)
+  const target=index+dir
+  if(target<0||target>=cates.length) return
+  [cates[index],cates[target]]=[cates[target],cates[index]]
+  await sb.from('douyin_posts').update({category:cates.join('，'),title:cates.join('，')}).eq('id',postId)
+  renderCalendar()
+}
+async function removeTopic(postId, index){
+  const {data:recs} = await sb.from('douyin_posts').select('*').eq('id',postId)
+  if(!recs||!recs.length) return
+  const rec=recs[0]
+  const cates=(rec.category||"").split('，').filter(Boolean)
+  cates.splice(index,1)
+  if(cates.length===0){
+    await sb.from('douyin_posts').delete().eq('id',postId)
+  }else{
+    await sb.from('douyin_posts').update({category:cates.join('，'),title:cates.join('，')}).eq('id',postId)
+  }
+  renderCalendar()
+}
+
+async function renderCalendar(){
+  const now=new Date()
+  if(calYear===undefined){ calYear=now.getFullYear(); calMonth=now.getMonth() }
+  document.getElementById('calTitle').innerText=`${calYear}年 ${calMonth+1}月 🐱`
+
+  if(!Object.keys(topicColorMap).length){
+    const {data}=await sb.from('topics').select('content,tag_color')
+    if(data) data.forEach(t=>{ topicColorMap[t.content]=t.tag_color; topicNameMap[normalizeName(t.content)]=t.content })
+  }
+
+  const weekNames=['日','一','二','三','四','五','六']
+  const firstDay=new Date(calYear,calMonth,1).getDay()
+  const daysInMonth=new Date(calYear,calMonth+1,0).getDate()
+  const prevDays=new Date(calYear,calMonth,0).getDate()
+
+  let posts=[]
+  try{ const {data}=await sb.from('douyin_posts').select('*'); posts=data||[] }catch(e){ alert("日历加载失败："+e.message) }
+  const byDate={}
+  posts.forEach(r=>{
+    if(!r.publish_date) return
+    if(!byDate[r.publish_date]) byDate[r.publish_date]=[]
+    byDate[r.publish_date].push(r)
+  })
+
+  const grid=document.getElementById('calGrid'); grid.innerHTML=""
+  weekNames.forEach(w=>{ const wd=document.createElement('div'); wd.className="cal-week"; wd.innerText=w; grid.appendChild(wd) })
+
+  for(let i=0;i<42;i++){
+    // 只渲染当月日期；上月填充位留空白占位，下月填充位不生成格子
+    if(i<firstDay){
+      const blank=document.createElement('div'); blank.className="cal-cell blank"
+      grid.appendChild(blank)
+      continue
+    }
+    if(i>=firstDay+daysInMonth) continue
+
+    const cell=document.createElement('div'); cell.className="cal-cell"
+    const dayNum=i-firstDay+1
+    const dateStr=`${calYear}-${String(calMonth+1).padStart(2,'0')}-${String(dayNum).padStart(2,'0')}`
+
+    const dayRecords=byDate[dateStr]||[]
+    const dayViews=dayRecords.length?formatViews(dayRecords[0].view_count):""
+    cell.innerHTML=`<div class="cal-day"><span>${dayNum}</span>${dayViews?`<span class="views">${dayViews}</span>`:""}</div>`
+
+    cell.addEventListener('dragover',(e)=>{ e.preventDefault(); cell.classList.add('over') })
+    cell.addEventListener('dragleave',()=>cell.classList.remove('over'))
+    cell.addEventListener('drop',async(e)=>{
+      e.preventDefault(); cell.classList.remove('over')
+      const topic=e.dataTransfer.getData('text/plain')
+      if(!topic) return
+      await appendTopicToDate(dateStr,topic)
+      renderCalendar()
+    })
+
+    dayRecords.forEach(r=>{
+      const cates=(r.category||"").split('，').filter(Boolean)
+      cates.forEach((c,idx)=>{
+        const m=matchTopic(c)
+        const color=m.color
+        const box=document.createElement('div'); box.className="cal-topic"
+        box.style.backgroundColor=color+"22"
+        box.style.borderLeftColor=color
+        box.innerHTML=`
+          <span class="num">${idx+1}.</span>
+          <span class="tname" style="color:${color}">${m.display}</span>
+          <span class="mv">
+            <button onclick="moveTopic(${r.id},${idx},-1)">↑</button>
+            <button onclick="moveTopic(${r.id},${idx},1)">↓</button>
+          </span>
+          <button class="rm" onclick="removeTopic(${r.id},${idx})">×</button>`
+        cell.appendChild(box)
+      })
+    })
+    grid.appendChild(cell)
+  }
+}
+
+// ===== 装饰层：飘浮爪印 + 闪烁星星 =====
+function buildDeco(){
+  const layer=document.getElementById('decoLayer')
+  if(!layer) return
+  const floatIcons=['🐾','🐾','✨','🐟','🧶','🌿']
+  const count=window.innerWidth<760?8:14
+  for(let i=0;i<count;i++){
+    const el=document.createElement('span')
+    el.className='deco'
+    el.textContent=floatIcons[Math.floor(Math.random()*floatIcons.length)]
+    el.style.left=(Math.random()*96)+'%'
+    el.style.top=(Math.random()*100)+'%'
+    el.style.animationDuration=(14+Math.random()*14)+'s'
+    el.style.animationDelay=(-Math.random()*20)+'s'
+    el.style.fontSize=(13+Math.random()*9)+'px'
+    layer.appendChild(el)
+  }
+  const starCount=window.innerWidth<760?5:9
+  for(let i=0;i<starCount;i++){
+    const el=document.createElement('span')
+    el.className='deco-star'
+    el.textContent=Math.random()>.5?'✦':'✧'
+    el.style.left=(Math.random()*98)+'%'
+    el.style.top=(Math.random()*98)+'%'
+    el.style.animationDelay=(Math.random()*3.4)+'s'
+    layer.appendChild(el)
+  }
+}
+buildDeco()
+
+loadPosts()
+</script>
+</body>
+</html>
