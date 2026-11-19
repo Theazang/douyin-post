@@ -188,7 +188,41 @@ td .ops button{padding:6px 11px;font-size:12px;border-radius:10px}
 .chart-legend{display:flex;gap:14px;font-size:12px;color:var(--coffee);margin:4px 0 8px}
 .chart-legend span{display:inline-flex;align-items:center;gap:5px}
 .chart-legend i{width:10px;height:10px;border-radius:50%;display:inline-block}
+/* 手机横屏：紧凑布局，日历占满宽度 */
+@media (orientation:landscape) and (max-height:560px){
+  body{padding:6px calc(6px + env(safe-area-inset-right)) 6px calc(6px + env(safe-area-inset-left))}
+  .tab{margin-bottom:8px;gap:6px}
+  .tab button{padding:7px 12px;font-size:12px;box-shadow:none}
+  .plan-layout{grid-template-columns:230px 1fr;gap:8px}
+  .plan-side:first-child{position:sticky;top:6px;max-height:calc(100vh - 12px);display:flex;flex-direction:column}
+  #topicBox{overflow-y:auto}
+  .plan-side h4{font-size:12px;margin-bottom:5px}
+  .filter-bar{gap:4px;margin-bottom:6px}
+  .filter-bar button{padding:4px 9px;font-size:11px}
+  .topic-grid{grid-template-columns:repeat(auto-fill,minmax(88px,1fr));gap:6px;margin-top:6px}
+  .topic-item{padding:6px 7px;font-size:12px}
+  .topic-actions button{padding:3px 7px;font-size:10px}
+  .cal-grid{gap:4px}
+  .cal-cell{min-height:66px;padding:5px;border-radius:12px}
+  .cal-week{font-size:11px;padding:3px 0}
+  .cal-day{font-size:11px;margin-bottom:2px}
+  .cal-topic{margin:3px 0;padding:4px 6px;font-size:11px;gap:4px}
+  .cal-topic .mv button{font-size:10px;padding:0 4px}
+  .cal-header{margin-bottom:6px}
+  .cal-header h3{font-size:15px}
+  .cal-nav button{padding:6px 10px;font-size:12px}
+  .card{padding:10px;margin-bottom:8px}
+  h3{font-size:14px}
+  .chart-card{margin-top:8px}
+  .deco{font-size:11px}
+  input,select,textarea{padding:8px 10px;margin:4px 0;font-size:13px}
+  button{padding:7px 11px;font-size:13px}
+  .month-bar{margin:2px 0 6px}
+  .chart-head{margin-bottom:4px}
+  .table-wrap{max-height:none}
+}
 @media (max-width:760px){ .plan-layout{grid-template-columns:1fr} .plan-side:first-child{position:static;max-height:none;display:block} }
+@media (max-width:760px) and (orientation:landscape){ .plan-layout{grid-template-columns:230px 1fr} }
 @media (max-width:480px){
   body{padding:9px}
   .topic-grid{grid-template-columns:repeat(2,1fr)}
